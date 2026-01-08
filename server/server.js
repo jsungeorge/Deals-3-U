@@ -79,19 +79,30 @@ cron.schedule('0 * * * *', async () => {
 });
 
 // ==========================================
-// 🚀 ROUTES
+// ROUTES
 // ==========================================
 
 app.post('/api/products/preview', async (req, res) => {
+  // LOG #1: Did we even get the request?
+  console.log("1️⃣ HIT - Preview Route Entered");
+  
   const { url } = req.body;
+  console.log("2️⃣ URL Received:", url); // Check if URL is coming through
+
   if (!url) return res.status(400).json({ error: "Missing URL" });
+
   try {
+    console.log("3️⃣ Starting Scraper..."); 
+    
+    // If the logs stop after #3, the scraper is crashing the whole server
     const data = await scrapeAmazon(url);
-    if (!data) return res.status(500).json({ error: "Product lookup failed. Amazon may be blocking requests." });
+    
+    console.log("4️⃣ Scraper Finished:", data); // Did it finish?
+
+    if (!data) return res.status(500).json({ error: "Product lookup failed." });
     res.json(data);
   } catch (err) {
-    console.error("PREVIEW ERROR:", err);
-
+    console.error("❌ CAUGHT ERROR:", err);
     res.status(500).json({ error: err.message });
   }
 });
