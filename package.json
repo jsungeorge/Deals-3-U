@@ -1,0 +1,11 @@
+{
+  "name": "deals-heart-u",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "cd client && npm install && npm run build && cd ../server && npm install",
+    "start": "node server/server.js"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

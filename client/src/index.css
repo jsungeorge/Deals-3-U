@@ -1,0 +1,54 @@
+:root {
+  /* The "Tech" Palette */
+  --bg-main: #f6f9fc;      /* Very light blue-grey (Stripe style) */
+  --bg-surface: #ffffff;   /* Pure white for cards */
+  --primary: #6366f1;      /* Indigo (Professional, not playful) */
+  --text-main: #1f2937;    /* Almost black (softer on eyes) */
+  --text-secondary: #6b7280; /* Grey text for details */
+  --border: #e5e7eb;       /* Subtle borders */
+  
+  /* Status Colors */
+  --success: #10b981;      /* Emerald Green */
+  --warning: #f59e0b;      /* Amber */
+  --danger: #ef4444;       /* Red */
+
+  /* Spacing & Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --radius: 8px;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Global Utilities */
+.btn {
+  padding: 10px 16px;
+  border-radius: var(--radius);
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 20px;
+}
