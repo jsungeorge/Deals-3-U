@@ -16,7 +16,7 @@ const Login = () => {
     e.preventDefault();
     try {
       // 1. Login
-      const res = await axios.post('http://localhost:5001/api/auth/login', { email, password });
+      const res = await axios.post('/api/auth/login', { email, password });
       
       // 2. Save Token
       login(res.data.user, res.data.token);
@@ -25,7 +25,7 @@ const Login = () => {
       // If we have a fully configured product waiting, save it now!
       if (location.state?.productToSave) {
         try {
-          await axios.post('http://localhost:5001/api/products/add', {
+          await axios.post('/api/products/add', {
             userId: res.data.user.id,
             ...location.state.productToSave
           });

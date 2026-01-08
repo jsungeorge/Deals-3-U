@@ -24,7 +24,7 @@ const Register = () => {
 
     try {
       // 2. Register the User
-      const res = await axios.post('http://localhost:5001/api/auth/register', {
+      const res = await axios.post('/api/auth/register', {
         name: formData.name,
         email: formData.email,
         password: formData.password
@@ -36,7 +36,7 @@ const Register = () => {
       // 4
       if (location.state?.productToSave) {
         try {
-          await axios.post('http://localhost:5001/api/products/add', {
+          await axios.post('/api/products/add', {
             userId: res.data.user.id, // Use the new User ID
             ...location.state.productToSave // Spread the product details (url, price, etc.)
           });

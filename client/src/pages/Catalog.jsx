@@ -15,7 +15,7 @@ const Home = () => {
     // Define fetch function inside to keep dependency array clean
     const fetchProducts = () => {
       if (user) {
-        axios.get(`http://localhost:5001/api/products/user/${user.id}?t=${new Date().getTime()}`)
+        axios.get(`/api/products/user/${user.id}?t=${new Date().getTime()}`)
           .then(res => {
             const sorted = res.data.sort((a, b) => {
               const aIsDeal = a.currentPrice <= (a.initialPrice * (1 - a.targetPercentage/100));
@@ -44,7 +44,7 @@ const Home = () => {
   const handleDelete = async (id) => {
     if(!confirm("Are you sure you want to stop tracking this item?")) return;
     try {
-      await axios.delete(`http://localhost:5001/api/products/${id}`);
+      await axios.delete(`/api/products/${id}`);
       // No manual fetch needed, the poller will catch it
     } catch (err) {
       alert("Error deleting item");

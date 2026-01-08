@@ -33,7 +33,7 @@ const AddProduct = () => {
     
     setLoading(true);
     try {
-      const res = await axios.post('http://localhost:5001/api/products/preview', { url: targetUrl });
+      const res = await axios.post('/api/products/preview', { url: targetUrl });
       setPreviewData(res.data);
       setStep(2);
     } catch (err) {
