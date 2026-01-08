@@ -90,6 +90,8 @@ app.post('/api/products/preview', async (req, res) => {
     if (!data) return res.status(500).json({ error: "Product lookup failed. Amazon may be blocking requests." });
     res.json(data);
   } catch (err) {
+    console.error("PREVIEW ERROR:", err);
+
     res.status(500).json({ error: err.message });
   }
 });
