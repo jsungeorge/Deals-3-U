@@ -3,12 +3,17 @@ const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 
 puppeteer.use(StealthPlugin());
 
-async function scrapeAmazon(url) {
-  // Silent logging
-  // console.log(`\n🕵️‍♀️ Background Scan: ${url}`); 
+let browserInstance = null;
 
-  // PRODUCTION SETTING: Headless "New" (No Window)
-  const browser = await puppeteer.launch({ 
+async function getBrowser() {
+  // If browser exists and is connected, reuse it
+  if (browserInstance && browserInstance.isConnected()) {
+    return browserInstance;
+  }
+
+  // Otherwise, launch a new one (This happens only once on startup)
+  console.log("Launching new browser instance...");
+  browserInstance = await puppeteer.launch({ 
     headless: "new", 
     args: [
       '--no-sandbox', 
@@ -22,31 +27,32 @@ async function scrapeAmazon(url) {
       '--disable-gpu'
     ]
   });
+  return browserInstance;
+}
 
-  const page = await browser.newPage();
-  
-  // 1. MASK AS REAL USER (Critical for Headless mode)
-  await page.setViewport({ width: 1920, height: 1080 });
-  await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
-  
-  // 2. ADD REAL HEADERS
-  await page.setExtraHTTPHeaders({
-    'Accept-Language': 'en-US,en;q=0.9',
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
-    'Sec-Ch-Ua': '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
-    'Sec-Ch-Ua-Mobile': '?0',
-    'Sec-Ch-Ua-Platform': '"macOS"',
-  });
-
+async function scrapeAmazon(url) {
+  let page = null;
   try {
-    // 3. GO TO PAGE (With slightly longer timeout for safety)
-    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45000 });
+    const browser = await getBrowser();
+    
+    // Create a new tab within the existing browser
+    page = await browser.newPage();
+    
+    // 1. MASK AS REAL USER
+    await page.setViewport({ width: 1920, height: 1080 });
+    await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+    await page.setExtraHTTPHeaders({
+      'Accept-Language': 'en-US,en;q=0.9',
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+      'Sec-Ch-Ua': '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+      'Sec-Ch-Ua-Mobile': '?0',
+      'Sec-Ch-Ua-Platform': '"macOS"',
+    });
 
-    // 4. RANDOM MOUSE MOVEMENT (Tricks bot detection)
-    await page.mouse.move(100, 100);
-    await page.mouse.move(200, 200);
+    // 2. GO TO PAGE (Optimized timeout)
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
-    // 5. EXTRACT DATA
+    // 3. EXTRACT DATA
     const data = await page.evaluate(() => {
       const getText = (s) => document.querySelector(s)?.innerText.trim() || null;
       const getAttr = (s, a) => document.querySelector(s)?.getAttribute(a) || null;
@@ -73,9 +79,9 @@ async function scrapeAmazon(url) {
       return { title, image, price: parseFloat(cleanPrice) };
     });
 
-    await browser.close();
+    // Only close the TAB, not the BROWSER
+    await page.close();
 
-    // Only return if we actually got a title (filters out blocks)
     if (data.title === "Unknown Product") return null;
 
     return {
@@ -85,8 +91,9 @@ async function scrapeAmazon(url) {
     };
 
   } catch (err) {
-    // Fail silently in background
-    await browser.close();
+    console.error("Scrape failed:", err.message);
+    // If the page crashed, try to close it to free memory
+    if (page) await page.close().catch(() => {});
     return null;
   }
 }
