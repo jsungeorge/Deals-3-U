@@ -13,7 +13,7 @@ const Profile = () => {
       if (user && user.id) {
         try {
           // 👇 CHANGED: Now fetches your Tracked Products
-          const res = await axios.get(`http://localhost:5001/api/products/user/${user.id}`);
+          const res = await axios.get(`/api/products/user/${user.id}`);
           setTrackedProducts(res.data);
         } catch (err) {
           console.error("Error fetching products:", err);

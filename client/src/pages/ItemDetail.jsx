@@ -12,7 +12,7 @@ const ItemDetail = () => {
 
   useEffect(() => {
     // Fetch the specific item details
-    axios.get(`http://localhost:5001/api/assets/${id}`)
+    axios.get(`api/assets/${id}`)
       .then(res => setItem(res.data))
       .catch(() => navigate('/')); // Go back if not found
   }, [id, navigate]);

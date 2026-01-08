@@ -59,7 +59,7 @@ const AddProduct = () => {
 
     setLoading(true);
     try {
-      await axios.post('http://localhost:5001/api/products/add', {
+      await axios.post('/api/products/add', {
         userId: user.id,
         url: previewData.url,
         title: previewData.title,
