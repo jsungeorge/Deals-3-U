@@ -6,38 +6,68 @@ import axios from 'axios';
 const AddProduct = () => {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
-  const location = useLocation(); // To get the guest URL
+  const location = useLocation();
 
-  const [step, setStep] = useState(1);
+  // 1. CLEANED UP STATE (Removed duplicates)
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState("Initializing scanner...");
   const [previewData, setPreviewData] = useState(null);
-  
+  const [step, setStep] = useState(1);
+  const [error, setError] = useState(''); // Added missing error state
+
   const [discount, setDiscount] = useState(5);
   const [anyDrop, setAnyDrop] = useState(false);
   const [emailNotify, setEmailNotify] = useState(false);
 
-  // 👇 NEW: Auto-fill and Preview if Guest URL exists
+  //2. Loading messages
+  const messages = [
+    ":D Launching the price tracker...",
+    "🔎 Scanning Amazon for details...",
+    "📦 Extracting product image...",
+    "This may take up to 30 seconds...",
+    "Almost there... :)"
+  ];
+
+  // 3. TEXT ROTATION EFFECT
+  useEffect(() => {
+    let interval;
+    if (loading) {
+      let i = 0;
+      setLoadingText(messages[0]);
+      interval = setInterval(() => {
+        i = (i + 1) % messages.length;
+        setLoadingText(messages[i]);
+      }, 3000); 
+    }
+    return () => clearInterval(interval);
+  }, [loading]);
+
+  // 4. CHECK FOR GUEST URL ON LOAD
   useEffect(() => {
     if (location.state?.guestUrl) {
       setUrl(location.state.guestUrl);
-      // Automatically trigger preview
       handlePreview(null, location.state.guestUrl);
     }
   }, [location.state]);
 
-  // Modified to accept optional manual URL (for the useEffect)
+  // 5. MERGED PREVIEW FUNCTION
   const handlePreview = async (e, manualUrl = null) => {
     if (e) e.preventDefault();
     const targetUrl = manualUrl || url;
     
+    if (!targetUrl) return;
+
     setLoading(true);
+    setError(''); // Clear errors
+    
     try {
       const res = await axios.post('/api/products/preview', { url: targetUrl });
       setPreviewData(res.data);
       setStep(2);
     } catch (err) {
-      alert("Error finding product. Check the link.");
+      console.error(err);
+      setError("Error finding product. Amazon might be blocking requests or the link is invalid.");
     } finally {
       setLoading(false);
     }
@@ -45,7 +75,7 @@ const AddProduct = () => {
 
   const handleSave = async () => {
     if (!user) {
-   const productToSave = {
+      const productToSave = {
         url: previewData.url,
         title: previewData.title,
         image: previewData.image,
@@ -71,17 +101,24 @@ const AddProduct = () => {
       navigate('/'); 
     } catch (err) {
       alert("Error saving product.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div style={{ maxWidth: '700px', margin: '60px auto', padding: '30px' }}>
-      
+      <style>
+      {`
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+      `}
+    </style>
       {/* STEP 1: PASTE LINK */}
       {step === 1 && (
         <div style={styles.card}>
           <h1 style={{ textAlign: 'center' }}>Track a New Deal</h1>
           <p style={{ textAlign: 'center', color: '#666' }}>Paste an Amazon link to begin.</p>
+          
           <form onSubmit={handlePreview} style={{ marginTop: '20px' }}>
             <input 
               type="url" 
@@ -91,9 +128,35 @@ const AddProduct = () => {
               required
               style={styles.input}
             />
-            <button type="submit" disabled={loading} style={styles.btn}>
-              {loading ? "Scanning..." : "Preview Item →"}
-            </button>
+            
+            {/* ERROR MESSAGE */}
+            {error && <p style={{color: 'red', textAlign: 'center'}}>{error}</p>}
+
+            {/* 6. UPDATED BUTTON UI */}
+            <button 
+    type="submit" 
+    disabled={loading} 
+    style={{
+    ...styles.btn, 
+    background: loading ? '#9ca3af' : '#db2777',
+    cursor: loading ? 'not-allowed' : 'pointer',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: '10px'
+  }}
+>
+  {loading ? (
+    <>
+      <span style={{ animation: 'spin 1s linear infinite', display: 'inline-block' }}>
+        🔄
+      </span>
+      <span>{loadingText}</span>
+    </>
+  ) : (
+    "Preview Item →"
+  )}
+</button>
           </form>
         </div>
       )}
@@ -102,7 +165,7 @@ const AddProduct = () => {
       {step === 2 && previewData && (
         <div style={styles.card}>
           <div style={{ display: 'flex', gap: '20px', marginBottom: '30px' }}>
-            <img src={previewData.image} style={{ width: '100px', objectFit: 'contain' }} />
+            <img src={previewData.image} style={{ width: '100px', objectFit: 'contain' }} alt="Product" />
             <div>
               <h3 style={{ margin: '0 0 10px 0' }}>{previewData.title.substring(0, 60)}...</h3>
               <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#059669' }}>
@@ -155,7 +218,6 @@ const AddProduct = () => {
           <div style={{ display: 'flex', gap: '10px', marginTop: '30px' }}>
             <button onClick={() => setStep(1)} style={{ ...styles.btn, background: '#ccc' }}>Back</button>
             
-            {/* 👇 DYNAMIC BUTTON TEXT */}
             <button onClick={handleSave} disabled={loading} style={styles.btn}>
               {loading ? "Saving..." : (user ? "Start Tracking" : "Sign in to save this item!")}
             </button>
