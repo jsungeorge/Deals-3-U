@@ -1,0 +1,24 @@
+name: Hourly Price Scanner
+
+on:
+  # 1. automatic
+  schedule:
+    - cron: '0 * * * *'
+  
+  # 2. Manual trigger
+
+jobs:
+  wake-and-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Production Scan
+        run: |
+          # Only runs if the secret is set, preventing errors in public forks
+          if [ -n "${{ secrets.CRON_SECRET }}" ]; then
+            curl -X POST https://deals-3-u.onrender.com/api/cron/scan \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            --fail
+          else
+             echo "CRON_SECRET is missing. Skipping scan."
+          fi
