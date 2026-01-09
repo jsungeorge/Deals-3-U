@@ -4,7 +4,7 @@ if (process.env.NODE_ENV !== 'production') {
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const cron = require('node-cron'); 
+const ScanLog = require('./models/ScanLog');
 const nodemailer = require('nodemailer');
 const User = require('./models/User');
 
@@ -33,7 +33,7 @@ const transporter = nodemailer.createTransport({
 
 const sendAlertEmail = async (userEmail, product) => {
   const mailOptions = {
-    from: '"Deals ❤️ U" <noreply@dealshunt.com>',
+    from: '"Deals ❤️ U" <dealsloveu@gmail.com',
     to: userEmail,
     subject: `🎉 Price Drop Alert: ${product.title.substring(0, 20)}...`,
     html: `
@@ -47,38 +47,91 @@ const sendAlertEmail = async (userEmail, product) => {
 
   try {
     await transporter.sendMail(mailOptions);
-    console.log(`📧 Email sent to ${userEmail}`);
+    console.log(`Email sent to ${userEmail}`);
   } catch (error) {
     console.error("❌ Email failed:", error);
   }
 };
 
-cron.schedule('0 * * * *', async () => {
-  // ... (Log start) ...
+const runBatchScan = async (source = "Automated") => {
+  console.log(`Starting Batch Scan (Source: ${source})...`);
+  const start = Date.now();
+  let emailsSentCount = 0;
+  let productsScannedCount = 0;
+
   try {
-    // We need to 'populate' user info to get their email address
+    // 1. Get all products with user details
     const products = await Product.find({}).populate('user');
-    
+    productsScannedCount = products.length;
+
+    console.log(`🔎 Found ${products.length} products to check.`);
+
+    // 2. Loop and Scrape
     for (const product of products) {
-       // ... (Delay & Scrape logic) ...
-       
-       if (freshData && freshData.price > 0 && freshData.price !== product.currentPrice) {
-          product.currentPrice = freshData.price;
-          
-          const target = product.initialPrice * (1 - product.targetPercentage/100);
-          
-          // CHECK IF DEAL & NOTIFY
-          if (product.currentPrice <= target) {
-             console.log(`🎉 DEAL! Sending email to ${product.user.email}`);
-             if (product.notifyOnDrop) {
-                await sendAlertEmail(product.user.email, product);
-             }
-          }
-          await product.save();
-       }
+      // Pause 2s between items to be nice to Amazon (and save CPU)
+      await new Promise(r => setTimeout(r, 2000));
+
+      const freshData = await scrapeAmazon(product.url);
+
+      if (freshData && freshData.price > 0) {
+         // Update Price Logic
+         if (freshData.price !== product.currentPrice) {
+            product.currentPrice = freshData.price;
+            
+            // Check Deal Logic
+            const target = product.initialPrice * (1 - product.targetPercentage/100);
+            
+            if (product.currentPrice <= target) {
+               console.log(`🎉 DEAL! Sending email for ${product.title.substring(0, 15)}...`);
+               if (product.notifyOnDrop) {
+                  await sendAlertEmail(product.user.email, product);
+                  emailsSentCount++;
+               }
+            }
+            await product.save();
+         }
+      }
     }
-  } catch (err) { console.error(err); }
+
+    // 3. ✅ LOG SUCCESS (The "Proof")
+    const duration = Date.now() - start;
+    await ScanLog.create({
+      status: 'Success',
+      productsScanned: productsScannedCount,
+      emailsSent: emailsSentCount,
+      durationMs: duration,
+      triggerSource: source
+    });
+    console.log(`✅ Scan Complete. Duration: ${duration/1000}s`);
+
+  } catch (err) {
+    console.error("❌ Scan Failed:", err);
+    // 4. LOG FAILURE
+    await ScanLog.create({
+      status: 'Failed',
+      error: err.message,
+      triggerSource: source
+    });
+  }
+};
+
+// ==========================================
+// ⚡ SECURE TRIGGER ENDPOINT
+// ==========================================
+app.post('/api/cron/scan', async (req, res) => {
+  const CRON_SECRET = process.env.CRON_SECRET; 
+  
+  // Security Check: Only gitHub can trigger this
+  if (req.headers.authorization !== `Bearer ${CRON_SECRET}`) {
+    console.log("🔒 Unauthorized scan attempt blocked.");
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  runBatchScan("GitHub Action").catch(console.error);
+  
+  res.json({ message: "Scan triggered successfully", timestamp: new Date() });
 });
+
 
 // ==========================================
 // ROUTES
