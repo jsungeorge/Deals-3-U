@@ -22,18 +22,18 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ MongoDB Connected'))
   .catch(err => console.error('❌ MongoDB Error:', err));
 
-  // EMAIL CONFIGURATION
+// EMAIL CONFIGURATION
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: process.env.EMAIL_USER, // Set this in .env (e.g., yourname@gmail.com)
-    pass: process.env.EMAIL_PASS  // Set this in .env (Use an "App Password"!)
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
   }
 });
 
 const sendAlertEmail = async (userEmail, product) => {
   const mailOptions = {
-    from: '"Deals ❤️ U" <dealsloveu@gmail.com',
+    from: '"Deals ❤️ U" <dealsloveu@gmail.com>', // Fixed typo in email format
     to: userEmail,
     subject: `🎉 Price Drop Alert: ${product.title.substring(0, 20)}...`,
     html: `
@@ -54,46 +54,57 @@ const sendAlertEmail = async (userEmail, product) => {
 };
 
 const runBatchScan = async (source = "Automated") => {
-  console.log(`Starting Batch Scan (Source: ${source})...`);
+  console.log(`🚀 Starting Batch Scan (Source: ${source})...`);
   const start = Date.now();
   let emailsSentCount = 0;
   let productsScannedCount = 0;
 
   try {
-    // 1. Get all products with user details
     const products = await Product.find({}).populate('user');
     productsScannedCount = products.length;
+    console.log(`🔎 Found ${products.length} products. Processing in batches...`);
 
-    console.log(`🔎 Found ${products.length} products to check.`);
+    // ⚡️ BATCHING CONFIGURATION
+    const BATCH_SIZE = 2; // Process 2 items at once
+    
+    // Helper function to process a single product
+    const processProduct = async (product) => {
+      try {
+        const freshData = await scrapeAmazon(product.url);
+        if (!freshData || freshData.price <= 0) return;
 
-    // 2. Loop and Scrape
-    for (const product of products) {
-      // Pause 2s between items to be nice to Amazon (and save CPU)
-      await new Promise(r => setTimeout(r, 2000));
-
-      const freshData = await scrapeAmazon(product.url);
-
-      if (freshData && freshData.price > 0) {
-         // Update Price Logic
-         if (freshData.price !== product.currentPrice) {
-            product.currentPrice = freshData.price;
-            
-            // Check Deal Logic
-            const target = product.initialPrice * (1 - product.targetPercentage/100);
-            
-            if (product.currentPrice <= target) {
-               console.log(`🎉 DEAL! Sending email for ${product.title.substring(0, 15)}...`);
-               if (product.notifyOnDrop) {
-                  await sendAlertEmail(product.user.email, product);
-                  emailsSentCount++;
-               }
+        if (freshData.price !== product.currentPrice) {
+          product.currentPrice = freshData.price;
+          const target = product.initialPrice * (1 - product.targetPercentage / 100);
+          
+          if (product.currentPrice <= target) {
+            console.log(`🎉 DEAL: ${product.title.substring(0, 15)}`);
+            if (product.notifyOnDrop) {
+              await sendAlertEmail(product.user.email, product);
+              emailsSentCount++;
             }
-            await product.save();
-         }
+          }
+          await product.save();
+        }
+      } catch (innerErr) {
+        console.error(`⚠️ Error processing ${product.title}:`, innerErr.message);
+      }
+    };
+
+    // 🔄 THE BATCH LOOP
+    for (let i = 0; i < products.length; i += BATCH_SIZE) {
+      const batch = products.slice(i, i + BATCH_SIZE);
+      console.log(`...Processing items ${i + 1} to ${i + batch.length}...`);
+      
+      // Run these 2 items in PARALLEL
+      await Promise.all(batch.map(product => processProduct(product)));
+      
+      // Small cooldown between batches
+      if (i + BATCH_SIZE < products.length) {
+         await new Promise(r => setTimeout(r, 2000));
       }
     }
 
-    // 3. ✅ LOG SUCCESS (The "Proof")
     const duration = Date.now() - start;
     await ScanLog.create({
       status: 'Success',
@@ -102,11 +113,10 @@ const runBatchScan = async (source = "Automated") => {
       durationMs: duration,
       triggerSource: source
     });
-    console.log(`✅ Scan Complete. Duration: ${duration/1000}s`);
+    console.log(`✅ Scan Complete. Duration: ${duration / 1000}s`);
 
   } catch (err) {
     console.error("❌ Scan Failed:", err);
-    // 4. LOG FAILURE
     await ScanLog.create({
       status: 'Failed',
       error: err.message,
@@ -121,7 +131,6 @@ const runBatchScan = async (source = "Automated") => {
 app.post('/api/cron/scan', async (req, res) => {
   const CRON_SECRET = process.env.CRON_SECRET; 
   
-  // Security Check: Only gitHub can trigger this
   if (req.headers.authorization !== `Bearer ${CRON_SECRET}`) {
     console.log("🔒 Unauthorized scan attempt blocked.");
     return res.status(401).json({ error: "Unauthorized" });
@@ -146,7 +155,6 @@ app.post('/api/products/preview', async (req, res) => {
     res.json(data);
   } catch (err) {
     console.error("PREVIEW ERROR:", err);
-
     res.status(500).json({ error: err.message });
   }
 });
@@ -184,8 +192,6 @@ app.delete('/api/products/:id', async (req, res) => {
   }
 });
 
-// Keep simulate for testing if you want, or remove if you want 100% purity.
-// Keeping it is harmless and helpful for verification.
 app.patch('/api/products/simulate-drop/:id', async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);

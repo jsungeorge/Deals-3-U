@@ -50,7 +50,7 @@ async function scrapeAmazon(url) {
     });
 
     // 2. GO TO PAGE (Optimized timeout)
-    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 90000 });
 
     // 3. EXTRACT DATA
     const data = await page.evaluate(() => {
