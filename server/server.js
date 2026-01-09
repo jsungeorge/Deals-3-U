@@ -25,12 +25,18 @@ mongoose.connect(process.env.MONGO_URI)
 // EMAIL CONFIGURATION
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
-  port: 587,            
-  secure: false,       
+  port: 587,
+  secure: false,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
-  }
+  },
+
+  family: 4,           
+  connectionTimeout: 10000, 
+  greetingTimeout: 5000,   
+  logger: true,       
+  debug: true          
 });
 
 const sendAlertEmail = async (userEmail, product) => {
