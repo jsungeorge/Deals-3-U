@@ -54,7 +54,7 @@ const sendAlertEmail = async (userEmail, product) => {
 };
 
 const runBatchScan = async (source = "Automated") => {
-  console.log(`🚀 Starting Batch Scan (Source: ${source})...`);
+  console.log(`Starting Batch Scan (Source: ${source})...`);
   const start = Date.now();
   let emailsSentCount = 0;
   let productsScannedCount = 0;
@@ -64,8 +64,8 @@ const runBatchScan = async (source = "Automated") => {
     productsScannedCount = products.length;
     console.log(`🔎 Found ${products.length} products. Processing in batches...`);
 
-    // ⚡️ BATCHING CONFIGURATION
-    const BATCH_SIZE = 2; // Process 2 items at once
+
+    const BATCH_SIZE = 1;;
     
     // Helper function to process a single product
     const processProduct = async (product) => {
