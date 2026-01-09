@@ -1,11 +1,12 @@
 name: Hourly Price Scanner
 
 on:
-  # 1. automatic
+  # 1. Automatic
   schedule:
     - cron: '0 * * * *'
   
   # 2. Manual trigger
+  workflow_dispatch:
 
 jobs:
   wake-and-scan:
