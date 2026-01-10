@@ -1,15 +1,20 @@
-# ❤️ Deals-3-U: Automated Price Tracker 
+# [Deals-3-U: Automated Price Tracker (Try It Live!)](https://deals-3-u.onrender.com)
 
-> **A full-stack distributed system that automates price tracking on Amazon, built to help students survive high tuition costs.**
+> **A full-stack distributed system that automates price tracking on Amazon, built to make smart shopping fun and effortless.**
 
-![MERN Stack](https://img.shields.io/badge/MERN-Full%20Stack-blue) ![Puppeteer](https://img.shields.io/badge/Puppeteer-Scraping-green) ![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-CI%2FCD-orange) ![Status](https://img.shields.io/badge/Status-Stable-success)
+![JavaScript](https://img.shields.io/badge/JavaScript-ES6%2B-yellow) ![MERN Stack](https://img.shields.io/badge/MERN-Full%20Stack-blue) ![Puppeteer](https://img.shields.io/badge/Puppeteer-Web%20Scraping-green) ![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-CI%2FCD-orange)
 
-## 📖 The Story
-As an international student at the **University of Waterloo**, managing finances is a survival skill. With tuition fees being what they are, I realized I was wasting hours manually checking Amazon for price drops on textbooks and tech essentials.
+## 🎥 Video Demo
+[**▶️ Watch the System in Action**](INSERT_YOUR_YOUTUBE_OR_LOOM_LINK_HERE)
 
-I didn't want a browser extension that only works when I'm online. I wanted a **"set and forget" engine**—something that runs in the cloud, watches products 24/7, and pings me the second a price drops.
+---
 
-What started as a simple script turned into a deep dive into **cloud infrastructure, distributed systems, and anti-bot evasion techniques**.
+## The Story
+Let's be real: we all love the thrill of finding a great deal. There is nothing quite like the satisfaction of snagging that tech gadget or everyday essential right when the price dips. But constantly refreshing tabs to check for discounts? That takes all the fun out of it.
+
+I built **Deals-3-U** because I wanted to automate the "hunt" for that sweet deal. I wanted a tool that does the heavy lifting in the background—turning the chaotic search for savings into a sleek, "set-and-forget" experience.
+
+This project isn't just about saving money; it's about upgrading the purchasing experience. It's a fun, hassle-free way for me (and any other user) to track the items we want and get the best price without the hustle.
 
 ---
 
@@ -18,19 +23,33 @@ What started as a simple script turned into a deep dive into **cloud infrastruct
 * **Custom Thresholds:** Users set a "Target Price" (e.g., "Notify me when this drops by 15%").
 * **Smart Scraping Engine:** A Puppeteer-based scraper optimized for low-memory environments.
 * **Historical Tracking:** Tracks initial vs. current price to calculate real savings.
-* **User Dashboard:** A clean MERN-stack frontend to manage tracked items.
+* **User Dashboard:** A clean, responsive dashboard to manage tracked items.
 
 ---
 
 ## Tech Stack
-* **Frontend:** React, Tailwind CSS, Vite
-* **Backend:** Node.js, Express, REST API
-* **Database:** MongoDB Atlas (Cloud)
-* **Scraper:** Puppeteer (Headless Chrome)
-* **DevOps/Infra:**
-    * **Render:** Cloud Hosting (Web Service)
-    * **GitHub Actions:** Cron Job Scheduler (The "Trigger")
-    * **Docker:** Containerization constraints
+
+### **Core Language**
+* **JavaScript (ES6+):** Utilized modern async/await patterns and strict data typing validation across the full stack.
+
+### **Frontend (Client)**
+* **React.js:** Component-based UI architecture for dynamic state management.
+* **Tailwind CSS:** Utility-first styling for a fully responsive, mobile-first design.
+* **Vite:** High-performance frontend build tool.
+
+### **Backend (Server)**
+* **Node.js & Express:** Scalable REST API handling product logic and scraping triggers.
+* **Puppeteer (Headless Chrome):** Advanced web automation tool used for DOM manipulation and data extraction.
+* **Nodemailer:** Logic layer for constructing and dispatching email notifications.
+
+### **Database**
+* **MongoDB Atlas:** Cloud-hosted NoSQL database for flexible schema design.
+* **Mongoose:** ODM (Object Data Modeling) for strict schema validation and data sanitization.
+
+### **Infrastructure & DevOps**
+* **Render (PaaS):** Cloud hosting running on containerized Docker environments.
+* **GitHub Actions:** CI/CD pipeline used as an external cron scheduler to trigger server processes.
+* **Docker Configuration:** Optimized memory usage flags (`--disable-dev-shm-usage`) to ensure stability within constrained micro-containers.
 
 ---
 
@@ -42,7 +61,7 @@ Building a scraper is easy. Building a *reliable* scraper on a **Free Tier Cloud
 **The Solution:**
 * **Strict Serial Processing:** Abandoned parallel `Promise.all` batching in favor of a stable, sequential loop.
 * **Resource Blocking:** Implemented Request Interception to block images, fonts, and stylesheets, reducing scraping memory footprint by ~50%.
-* **Docker Flags:** Tuned Puppeteer launch args (`--disable-dev-shm-usage`, `--no-sandbox`) to survive inside a constrained Docker container.
+* **Container Optimization:** Tuned Puppeteer launch arguments to function reliably within the Docker runtime.
 
 ### 2. The "30-Second Death" (Timeouts)
 **The Problem:** Cloud servers can be slow. A standard 30-second timeout often failed when Amazon's pages were heavy, causing the scan to abort mid-process.
@@ -57,23 +76,4 @@ Building a scraper is easy. Building a *reliable* scraper on a **Free Tier Cloud
 * Email delivery is currently restricted by infrastructure limits. (Future fix: Integrate SendGrid API to bypass SMTP restrictions).
 
 ### 4. The "Sleepy Server" (Cold Starts)
-**The Problem:** Free tier servers "spin down" after inactivity. A standard `setInterval` in Node.js would die when the server slept.
-**The Solution:**
-* Decoupled the scheduler from the application. I used **GitHub Actions** as an external "Cron Job" that sends a secure HTTP request to the server every hour, forcing it to wake up and run the scan.
-
----
-
-## How It Works (Architecture)
-
-1.  **Trigger:** GitHub Actions runs a cron job: `0 * * * *` (Hourly).
-2.  **Wake Up:** It sends a `POST /api/cron/scan` request with a secure `CRON_SECRET` key.
-3.  **Scrape:** The Express server launches Puppeteer, visits Amazon, and scrapes the price.
-4.  **Analyze:**
-    * `If (Current Price < Target Price) -> Deal Found`
-    * `If (Deal Found) -> Update Database & Attempt Alert`
-5.  **Sleep:** The server goes back to idle to save resources.
-
-## Future Improvements
-* **Proxy Rotation:** To prevent Amazon from rate-limiting the scraper during high-volume scans.
-* **Email API Integration:** Switch from SMTP (Nodemailer) to SendGrid/Mailgun to bypass cloud firewalls.
-* **SMS Alerts:** Integration with Twilio for instant text notifications.
+**The Problem:** Free tier servers "spin down" after inactivity.
