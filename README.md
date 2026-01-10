@@ -4,9 +4,6 @@
 
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES6%2B-yellow) ![MERN Stack](https://img.shields.io/badge/MERN-Full%20Stack-blue) ![Puppeteer](https://img.shields.io/badge/Puppeteer-Web%20Scraping-green) ![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-CI%2FCD-orange)
 
-## 🎥 Video Demo
-[**▶️ Watch the System in Action**](INSERT_YOUR_YOUTUBE_OR_LOOM_LINK_HERE)
-
 ---
 
 ## The Story
