@@ -12,9 +12,9 @@
 ## The Story
 Let's be real: we all love the thrill of finding a great deal. There is nothing quite like the satisfaction of snagging that tech gadget or everyday essential right when the price dips. But constantly refreshing tabs to check for discounts? That takes all the fun out of it.
 
-I built **Deals-3-U** because I wanted to automate the "hunt" for that sweet deal. I wanted a tool that does the heavy lifting in the background—turning the chaotic search for savings into a sleek, "set-and-forget" experience.
+I built this project because I wanted to automate the "hunt" for that sweet deal. I wanted a tool that does the heavy lifting in the background, giving me a "set-and-forget" experience.
 
-This project isn't just about saving money; it's about upgrading the purchasing experience. It's a fun, hassle-free way for me (and any other user) to track the items we want and get the best price without the hustle.
+This project isn't just about saving money, it's about upgrading the purchasing experience. It's a fun, hassle-free way for me (and any other user) to track the items we want and get the best price without the hustle.
 
 ---
 
@@ -30,26 +30,12 @@ This project isn't just about saving money; it's about upgrading the purchasing 
 ## Tech Stack
 
 ### **Core Language**
-* **JavaScript (ES6+):** Utilized modern async/await patterns and strict data typing validation across the full stack.
-
-### **Frontend (Client)**
-* **React.js:** Component-based UI architecture for dynamic state management.
-* **Tailwind CSS:** Utility-first styling for a fully responsive, mobile-first design.
-* **Vite:** High-performance frontend build tool.
-
-### **Backend (Server)**
-* **Node.js & Express:** Scalable REST API handling product logic and scraping triggers.
-* **Puppeteer (Headless Chrome):** Advanced web automation tool used for DOM manipulation and data extraction.
-* **Nodemailer:** Logic layer for constructing and dispatching email notifications.
-
-### **Database**
-* **MongoDB Atlas:** Cloud-hosted NoSQL database for flexible schema design.
-* **Mongoose:** ODM (Object Data Modeling) for strict schema validation and data sanitization.
-
-### **Infrastructure & DevOps**
-* **Render (PaaS):** Cloud hosting running on containerized Docker environments.
-* **GitHub Actions:** CI/CD pipeline used as an external cron scheduler to trigger server processes.
-* **Docker Configuration:** Optimized memory usage flags (`--disable-dev-shm-usage`) to ensure stability within constrained micro-containers.
+* **JavaScript ES6+, HTML5, CSS3** 
+* **Frontend:** React, Tailwind CSS, Vite
+* **Backend:** Node.js, Express, Nodemailer
+* **Automation:** Puppeteer (Headless Chrome)
+* **Database:** MongoDB Atlas, Mongoose
+* **DevOps:** Render (Dockerized Containers), GitHub Actions (CI/CD)
 
 ---
 
