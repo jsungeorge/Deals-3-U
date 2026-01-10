@@ -41,7 +41,7 @@ const transporter = nodemailer.createTransport({
 
 const sendAlertEmail = async (userEmail, product) => {
   const mailOptions = {
-    from: '"Deals ❤️ U" <dealsloveu@gmail.com>', // Fixed typo in email format
+    from: '"Deals ❤️ U" <dealsloveu@gmail.com>',
     to: userEmail,
     subject: `🎉 Price Drop Alert: ${product.title.substring(0, 20)}...`,
     html: `
