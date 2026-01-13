@@ -8,19 +8,17 @@ const AddProduct = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // 1. CLEANED UP STATE (Removed duplicates)
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [loadingText, setLoadingText] = useState("Initializing scanner...");
   const [previewData, setPreviewData] = useState(null);
   const [step, setStep] = useState(1);
-  const [error, setError] = useState(''); // Added missing error state
+  const [error, setError] = useState('');
 
   const [discount, setDiscount] = useState(5);
   const [anyDrop, setAnyDrop] = useState(false);
   const [emailNotify, setEmailNotify] = useState(false);
 
-  //2. Loading messages
   const messages = [
     ":D Launching the price tracker...",
     "🔎 Scanning Amazon for details...",
@@ -29,7 +27,7 @@ const AddProduct = () => {
     "Almost there... :)"
   ];
 
-  // 3. TEXT ROTATION EFFECT
+  // TEXT ROTATION EFFECT
   useEffect(() => {
     let interval;
     if (loading) {
@@ -43,7 +41,7 @@ const AddProduct = () => {
     return () => clearInterval(interval);
   }, [loading]);
 
-  // 4. CHECK FOR GUEST URL ON LOAD
+  // CHECK FOR GUEST URL
   useEffect(() => {
     if (location.state?.guestUrl) {
       setUrl(location.state.guestUrl);
@@ -51,7 +49,6 @@ const AddProduct = () => {
     }
   }, [location.state]);
 
-  // 5. MERGED PREVIEW FUNCTION
   const handlePreview = async (e, manualUrl = null) => {
     if (e) e.preventDefault();
     const targetUrl = manualUrl || url;
@@ -59,7 +56,7 @@ const AddProduct = () => {
     if (!targetUrl) return;
 
     setLoading(true);
-    setError(''); // Clear errors
+    setError('');
     
     try {
       const res = await axios.post('/api/products/preview', { url: targetUrl });
@@ -91,7 +88,7 @@ const AddProduct = () => {
     try {
       await axios.post('/api/products/add', {
         userId: user.id,
-        url: previewData.url,
+        url: previewData.url, // Ensure we send the cleaned URL if backend provides it
         title: previewData.title,
         image: previewData.image,
         price: previewData.price,
@@ -129,34 +126,32 @@ const AddProduct = () => {
               style={styles.input}
             />
             
-            {/* ERROR MESSAGE */}
             {error && <p style={{color: 'red', textAlign: 'center'}}>{error}</p>}
 
-            {/* 6. UPDATED BUTTON UI */}
             <button 
-    type="submit" 
-    disabled={loading} 
-    style={{
-    ...styles.btn, 
-    background: loading ? '#9ca3af' : '#db2777',
-    cursor: loading ? 'not-allowed' : 'pointer',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: '10px'
-  }}
->
-  {loading ? (
-    <>
-      <span style={{ animation: 'spin 1s linear infinite', display: 'inline-block' }}>
-        🔄
-      </span>
-      <span>{loadingText}</span>
-    </>
-  ) : (
-    "Preview Item →"
-  )}
-</button>
+              type="submit" 
+              disabled={loading} 
+              style={{
+                ...styles.btn, 
+                background: loading ? '#9ca3af' : '#db2777',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '10px'
+              }}
+            >
+              {loading ? (
+                <>
+                  <span style={{ animation: 'spin 1s linear infinite', display: 'inline-block' }}>
+                    🔄
+                  </span>
+                  <span>{loadingText}</span>
+                </>
+              ) : (
+                "Preview Item →"
+              )}
+            </button>
           </form>
         </div>
       )}
@@ -169,7 +164,8 @@ const AddProduct = () => {
             <div>
               <h3 style={{ margin: '0 0 10px 0' }}>{previewData.title.substring(0, 60)}...</h3>
               <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#059669' }}>
-                ${previewData.formattedPrice}
+                {/* ⬇️ THIS WAS THE BUG. CHANGED FROM formattedPrice TO price */}
+                ${previewData.price} 
               </div>
             </div>
           </div>
