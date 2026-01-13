@@ -70,7 +70,7 @@ const AddProduct = () => {
     }
   };
 
-  const handleSave = async () => {
+    const handleSave = async () => {
     if (!user) {
       const productToSave = {
         url: previewData.url,
@@ -80,7 +80,8 @@ const AddProduct = () => {
         targetPercentage: anyDrop ? 0.1 : discount,
         notifyOnDrop: emailNotify
       };
-      navigate('/register', { state: { productToSave } }); 
+      
+      navigate('/login', { state: { productToSave } }); 
       return;
     }
 
