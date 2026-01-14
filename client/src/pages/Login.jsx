@@ -20,29 +20,54 @@ const Login = () => {
       
       const { user, token } = res.data; // Extract user/token immediately
 
-      // 3.
+      // 2. ⚡️ AUTO-SAVE LOGIC (The "Kitchen Sink" Fix)
       if (location.state?.productToSave) {
         try {
           const product = location.state.productToSave;
-        
           const calculatedTargetPrice = product.price * (1 - (product.targetPercentage / 100));
 
           await axios.post('/api/products/add', 
             {
+              // 1. User ID (Safety Check)
               userId: user._id || user.id,
+
+              // 2. The Original Data
               ...product,
-              targetPrice: calculatedTargetPrice // <--- ADD THIS
+
+              // 3. ✅ FIELD NAME SAFETY NET (Send EVERYTHING)
+              // Database wants 'name'? We got it. Wants 'title'? Got that too.
+              name: product.title, 
+              title: product.title,
+              
+              // Database wants 'image'? 'imageUrl'? 'img'? Send them all.
+              image: product.image,
+              imageUrl: product.image,
+              img: product.image,
+
+              // Database wants 'price'? 'currentPrice'?
+              price: product.price,
+              currentPrice: product.price,
+
+              // 4. ✅ REQUIRED DEFAULTS (The likely crash fix)
+              // If your DB requires a category and we sent null, it crashes.
+              category: "General", 
+              available: true,
+
+              // 5. Calculated Logic
+              targetPrice: calculatedTargetPrice
             },
             {
               headers: { 'Authorization': `Bearer ${token}` }
             }
           );
-          alert("Item saved successfully!"); 
+          alert("✅ Success! Item saved to dashboard."); 
         } catch (saveErr) {
           console.error("Auto-save failed:", saveErr);
-          // Log the actual server error message to the console so we can see it
-          console.log("SERVER ERROR DETAIL:", saveErr.response?.data);
-          alert(`Failed to save: ${saveErr.response?.data?.message || "Server Error"}`);
+          
+          // 🔎 THE ERROR REVEALER
+          // This will print the EXACT reason from the database (e.g., "Path 'category' is required")
+          const reason = JSON.stringify(saveErr.response?.data) || saveErr.message;
+          alert(`SAVE FAILED. Please tell me what this says:\n\n${reason}`);
         }
       }
 
