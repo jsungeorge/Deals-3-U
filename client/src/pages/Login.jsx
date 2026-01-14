@@ -21,28 +21,31 @@ const Login = () => {
       // 2. Save Token (Update Global State)
       login(res.data.user, res.data.token);
       
-      // 3. AUTO-SAVE LOGIC
-      // If we have a fully configured product waiting, save it now!
+   // 3. AUTO-SAVE LOGIC
       if (location.state?.productToSave) {
         try {
-          await axios.post('/api/products/add', {
-            // ⚠️ THE FIX: Check for _id (MongoDB standard) OR id
-            userId: res.data.user._id || res.data.user.id,
-            ...location.state.productToSave
-          });
+          const userId = res.data.user._id || res.data.user.id;
+          const token = res.data.token; 
+
+          await axios.post('/api/products/add', 
+            // Body Data
+            {
+              userId: userId,
+              ...location.state.productToSave
+            },
+            // headers
+            {
+              headers: {
+                'Authorization': `Bearer ${token}` 
+              }
+            }
+          );
           console.log("✅ Auto-saved item after login");
         } catch (saveErr) {
           console.error("❌ Auto-save failed:", saveErr);
+          console.error("Backend response:", saveErr.response?.data);
         }
-        // Go straight to dashboard since it's saved
-        navigate('/');
-      } 
-      // Fallback: If we just have a raw URL (old flow)
-      else if (location.state?.guestUrl) {
-        navigate(location.state.returnUrl, { state: { guestUrl: location.state.guestUrl } });
-      } 
-      // Default: Just go home
-      else {
+        
         navigate('/');
       }
 
