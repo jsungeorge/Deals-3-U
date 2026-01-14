@@ -70,7 +70,8 @@ const AddProduct = () => {
     }
   };
 
-    const handleSave = async () => {
+   const handleSave = async () => {
+    // 1. If user is NOT logged in: Send them to Login with the product data
     if (!user) {
       const productToSave = {
         url: previewData.url,
@@ -85,14 +86,12 @@ const AddProduct = () => {
       return;
     }
 
+    // 2. If user IS logged in: Save normally (Existing logic)
     setLoading(true);
     try {
       await axios.post('/api/products/add', {
-        userId: user.id,
-        url: previewData.url, // Ensure we send the cleaned URL if backend provides it
-        title: previewData.title,
-        image: previewData.image,
-        price: previewData.price,
+        userId: user._id || user.id, // Safety check
+        ...previewData,
         targetPercentage: anyDrop ? 0.1 : discount,
         notifyOnDrop: emailNotify
       });

@@ -18,25 +18,26 @@ const Login = () => {
       // 1. Login
       const res = await axios.post('/api/auth/login', { email, password });
       
-      // 2. Save Token
+      // 2. Save Token (Update Global State)
       login(res.data.user, res.data.token);
       
-      // 3. 
+      // 3. AUTO-SAVE LOGIC
       // If we have a fully configured product waiting, save it now!
       if (location.state?.productToSave) {
         try {
           await axios.post('/api/products/add', {
-            userId: res.data.user.id,
+            // ⚠️ THE FIX: Check for _id (MongoDB standard) OR id
+            userId: res.data.user._id || res.data.user.id,
             ...location.state.productToSave
           });
-          console.log("Auto-saved item after login");
+          console.log("✅ Auto-saved item after login");
         } catch (saveErr) {
-          console.error("Auto-save failed:", saveErr);
+          console.error("❌ Auto-save failed:", saveErr);
         }
         // Go straight to dashboard since it's saved
         navigate('/');
       } 
-      // Fallback: If we just have a raw URL (old flow), go back to Add Page
+      // Fallback: If we just have a raw URL (old flow)
       else if (location.state?.guestUrl) {
         navigate(location.state.returnUrl, { state: { guestUrl: location.state.guestUrl } });
       } 
@@ -86,7 +87,6 @@ const Login = () => {
 
       <p style={{ textAlign: 'center', marginTop: '20px', fontSize: '0.9rem', color: '#666' }}>
         New here? 
-        {/* Pass the state to Register too if they click "Sign Up" from Login page */}
         <Link 
           to="/register" 
           state={location.state} 

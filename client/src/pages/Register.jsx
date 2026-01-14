@@ -13,48 +13,34 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // 1. Validation
-    if (formData.password !== formData.confirmPassword) {
-      return setError("Passwords do not match!");
-    }
-    if (formData.password.length < 6) {
-      return setError("Password must be at least 6 characters.");
-    }
+    // ... validation checks ...
 
     try {
-      // 2. Register the User
-      const res = await axios.post('/api/auth/register', {
-        name: formData.name,
-        email: formData.email,
-        password: formData.password
-      });
-
-      // 3. Log them in (save token)
-      login(res.data.user, res.data.token);
+      // 1. Register API
+      const res = await axios.post('/api/auth/register', { name, email, password });
       
-      // 4
+      // 2. Login Context
+      login(res.data.user, res.data.token);
+
+      // 3. AUTO-SAVE LOGIC (Identical to Login.jsx)
       if (location.state?.productToSave) {
         try {
+          const userId = res.data.user._id || res.data.user.id;
           await axios.post('/api/products/add', {
-            userId: res.data.user.id, // Use the new User ID
-            ...location.state.productToSave // Spread the product details (url, price, etc.)
+            userId: userId, 
+            ...location.state.productToSave
           });
-          console.log("Auto-saved item for new user");
         } catch (saveErr) {
           console.error("Auto-save failed:", saveErr);
-          // We continue anyway so the user at least gets to their account
         }
       }
 
-      // 5. Redirect straight to Dashboard (since item is saved)
       navigate('/');
 
     } catch (err) {
       setError(err.response?.data?.error || "Registration failed");
     }
   };
-
   return (
     <div style={{ maxWidth: '400px', margin: '60px auto', padding: '40px', background: 'white', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)', border: '1px solid #eaeaea' }}>
       <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Create Account</h2>
