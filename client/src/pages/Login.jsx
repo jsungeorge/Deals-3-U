@@ -15,39 +15,37 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // 1. Login
+      // 1. Authenticate with Backend
       const res = await axios.post('/api/auth/login', { email, password });
       
-      // 2. Save Token (Update Global State)
-      login(res.data.user, res.data.token);
-      
-   // 3. AUTO-SAVE LOGIC
+      const { user, token } = res.data; // Extract user/token immediately
+
+      // 2. ⚡️ AUTO-SAVE (Do this BEFORE updating global state)
       if (location.state?.productToSave) {
         try {
-          const userId = res.data.user._id || res.data.user.id;
-          const token = res.data.token; 
-
           await axios.post('/api/products/add', 
-            // Body Data
             {
-              userId: userId,
+              // Check both ID formats just in case
+              userId: user._id || user.id, 
               ...location.state.productToSave
             },
-            // headers
             {
-              headers: {
-                'Authorization': `Bearer ${token}` 
-              }
+              headers: { 'Authorization': `Bearer ${token}` }
             }
           );
-          console.log("✅ Auto-saved item after login");
+          // Alert just so we KNOW it worked (you can remove this later)
+          alert("Item saved successfully!"); 
         } catch (saveErr) {
-          console.error("❌ Auto-save failed:", saveErr);
-          console.error("Backend response:", saveErr.response?.data);
+          console.error("Auto-save failed:", saveErr);
+          alert(`Failed to save item: ${saveErr.response?.data?.message || saveErr.message}`);
         }
-        
-        navigate('/');
       }
+
+      // 3. NOW update the global state (This triggers the redirect)
+      login(user, token);
+      
+      // 4. Manual redirect (backup)
+      navigate('/');
 
     } catch (err) {
       setError(err.response?.data?.error || "Invalid credentials");
