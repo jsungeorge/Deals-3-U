@@ -6,41 +6,81 @@ import axios from 'axios';
 const Register = () => {
   const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: ''});
   const [error, setError] = useState('');
-  const { login } = useContext(AuthContext);
   
+  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // ... validation checks ...
+
+    // 1. Validation Checks
+    if (formData.password !== formData.confirmPassword) {
+      return setError("Passwords do not match!");
+    }
+    if (formData.password.length < 6) {
+      return setError("Password must be at least 6 characters.");
+    }
 
     try {
-      // 1. Register API
-      const res = await axios.post('/api/auth/register', { name, email, password });
+      // 2. Register API (Fix: Use formData values)
+      const res = await axios.post('/api/auth/register', { 
+        name: formData.name, 
+        email: formData.email, 
+        password: formData.password 
+      });
       
-      // 2. Login Context
-      login(res.data.user, res.data.token);
+      // Extract User & Token immediately
+      const { user, token } = res.data;
 
-      // 3. AUTO-SAVE LOGIC (Identical to Login.jsx)
+      // 3. ⚡️ AUTO-SAVE LOGIC (The "Kitchen Sink" Fix)
+      // Identical logic to Login.jsx ensures data passes validation
       if (location.state?.productToSave) {
         try {
-          const userId = res.data.user._id || res.data.user.id;
-          await axios.post('/api/products/add', {
-            userId: userId, 
-            ...location.state.productToSave
-          });
+          const product = location.state.productToSave;
+          const calculatedTargetPrice = product.price * (1 - (product.targetPercentage / 100));
+
+          await axios.post('/api/products/add', 
+            {
+              // User ID (Safety Check)
+              userId: user._id || user.id,
+
+              // Original Data
+              ...product,
+
+              // ✅ FIELD MAPPING (Ensures DB validation passes)
+              name: product.title, 
+              title: product.title,
+              image: product.image,
+              currentPrice: product.price, // DB might want currentPrice or price
+              
+              // ✅ REQUIRED DEFAULTS
+              category: "General", 
+              available: true,
+              targetPrice: calculatedTargetPrice
+            },
+            {
+              // ✅ CRITICAL: Pass the token we just got!
+              headers: { 'Authorization': `Bearer ${token}` }
+            }
+          );
+          console.log("✅ Item auto-saved for new user");
         } catch (saveErr) {
-          console.error("Auto-save failed:", saveErr);
+          console.error("❌ Auto-save failed:", saveErr);
+          // We intentionally continue logging them in even if save fails
         }
       }
 
+      // 4. Login Context & Redirect
+      login(user, token);
       navigate('/');
 
     } catch (err) {
+      console.error(err);
       setError(err.response?.data?.error || "Registration failed");
     }
   };
+
   return (
     <div style={{ maxWidth: '400px', margin: '60px auto', padding: '40px', background: 'white', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)', border: '1px solid #eaeaea' }}>
       <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Create Account</h2>

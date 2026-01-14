@@ -15,12 +15,11 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // 1. Authenticate with Backend
+      // 1. Authenticate
       const res = await axios.post('/api/auth/login', { email, password });
-      
-      const { user, token } = res.data; // Extract user/token immediately
+      const { user, token } = res.data;
 
-      // 2. ⚡️ AUTO-SAVE LOGIC (The "Kitchen Sink" Fix)
+      // 2. Auto-Save Product (Silent & Fast)
       if (location.state?.productToSave) {
         try {
           const product = location.state.productToSave;
@@ -28,53 +27,33 @@ const Login = () => {
 
           await axios.post('/api/products/add', 
             {
-              // 1. User ID (Safety Check)
+              // User ID (Safety Check)
               userId: user._id || user.id,
 
-              // 2. The Original Data
+              // Product Data
               ...product,
-
-              // 3. ✅ FIELD NAME SAFETY NET (Send EVERYTHING)
-              // Database wants 'name'? We got it. Wants 'title'? Got that too.
-              name: product.title, 
-              title: product.title,
               
-              // Database wants 'image'? 'imageUrl'? 'img'? Send them all.
+              // Field Name Safety Nets (Ensures DB accepts it)
+              name: product.title, 
               image: product.image,
-              imageUrl: product.image,
-              img: product.image,
-
-              // Database wants 'price'? 'currentPrice'?
-              price: product.price,
               currentPrice: product.price,
-
-              // 4. ✅ REQUIRED DEFAULTS (The likely crash fix)
-              // If your DB requires a category and we sent null, it crashes.
-              category: "General", 
+              category: "General", // Default category to prevent crashes
               available: true,
-
-              // 5. Calculated Logic
               targetPrice: calculatedTargetPrice
             },
             {
               headers: { 'Authorization': `Bearer ${token}` }
             }
           );
-          alert("✅ Success! Item saved to dashboard."); 
+          console.log("Item auto-saved successfully");
         } catch (saveErr) {
+          // If it fails, we log it but don't stop the user from logging in
           console.error("Auto-save failed:", saveErr);
-          
-          // 🔎 THE ERROR REVEALER
-          // This will print the EXACT reason from the database (e.g., "Path 'category' is required")
-          const reason = JSON.stringify(saveErr.response?.data) || saveErr.message;
-          alert(`SAVE FAILED. Please tell me what this says:\n\n${reason}`);
         }
       }
 
-      // 3. NOW update the global state (This triggers the redirect)
+      // 3. Update Global State & Redirect
       login(user, token);
-      
-      // 4. Manual redirect (backup)
       navigate('/');
 
     } catch (err) {
