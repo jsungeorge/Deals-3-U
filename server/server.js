@@ -47,7 +47,7 @@ const sendAlertEmail = async (userEmail, product) => {
       },
       {
         headers: {
-          'api-key': process.env.BREVO_API_KEY, // The key you added to .env
+          'api-key': process.env.BREVO_API_KEY,
           'content-type': 'application/json',
           'accept': 'application/json'
         }
