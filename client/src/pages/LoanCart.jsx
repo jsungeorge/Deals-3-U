@@ -202,14 +202,25 @@ const handleSave = async () => {
             <hr style={{border: 'none', borderTop: '1px solid #ddd', margin: '20px 0'}} />
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <input 
-                type="checkbox" 
-                checked={emailNotify} 
-                onChange={(e) => setEmailNotify(e.target.checked)}
-                style={{ width: '18px', height: '18px' }}
-              />
-              <span>Send me an email notification</span>
-            </div>
+       <input 
+        type="checkbox" 
+        id="emailNotify" // 1. Added ID
+        checked={emailNotify} 
+        onChange={(e) => setEmailNotify(e.target.checked)}
+        style={{ 
+      width: '18px', 
+      height: '18px', 
+      accentColor: '#db2777', // 2. Matches your Pink Theme
+      cursor: 'pointer' 
+    }}
+  />
+  <label 
+    htmlFor="emailNotify" 
+    style={{ cursor: 'pointer', userSelect: 'none' }}
+  >
+    Send me an email notification
+  </label>
+</div>
           </div>
 
           <div style={{ display: 'flex', gap: '10px', marginTop: '30px' }}>
