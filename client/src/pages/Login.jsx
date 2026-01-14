@@ -20,24 +20,29 @@ const Login = () => {
       
       const { user, token } = res.data; // Extract user/token immediately
 
-      // 2. ⚡️ AUTO-SAVE (Do this BEFORE updating global state)
+      // 3.
       if (location.state?.productToSave) {
         try {
+          const product = location.state.productToSave;
+        
+          const calculatedTargetPrice = product.price * (1 - (product.targetPercentage / 100));
+
           await axios.post('/api/products/add', 
             {
-              // Check both ID formats just in case
-              userId: user._id || user.id, 
-              ...location.state.productToSave
+              userId: user._id || user.id,
+              ...product,
+              targetPrice: calculatedTargetPrice // <--- ADD THIS
             },
             {
               headers: { 'Authorization': `Bearer ${token}` }
             }
           );
-          // Alert just so we KNOW it worked (you can remove this later)
           alert("Item saved successfully!"); 
         } catch (saveErr) {
           console.error("Auto-save failed:", saveErr);
-          alert(`Failed to save item: ${saveErr.response?.data?.message || saveErr.message}`);
+          // Log the actual server error message to the console so we can see it
+          console.log("SERVER ERROR DETAIL:", saveErr.response?.data);
+          alert(`Failed to save: ${saveErr.response?.data?.message || "Server Error"}`);
         }
       }
 
