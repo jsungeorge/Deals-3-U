@@ -70,28 +70,30 @@ const AddProduct = () => {
     }
   };
 
-   const handleSave = async () => {
-    // 1. If user is NOT logged in: Send them to Login with the product data
+const handleSave = async () => {
+    // 1. IF USER IS GUEST (Sending data to Login)
     if (!user) {
       const productToSave = {
-        url: previewData.url,
+        url: url,
         title: previewData.title,
         image: previewData.image,
         price: previewData.price,
         targetPercentage: anyDrop ? 0.1 : discount,
         notifyOnDrop: emailNotify
       };
-      
       navigate('/login', { state: { productToSave } }); 
       return;
     }
 
-    // 2. If user IS logged in: Save normally (Existing logic)
+    // 2. IF USER IS LOGGED IN (Direct Save)
     setLoading(true);
     try {
       await axios.post('/api/products/add', {
-        userId: user._id || user.id, // Safety check
-        ...previewData,
+        userId: user._id || user.id,
+        url: url, 
+        title: previewData.title,
+        image: previewData.image,
+        price: previewData.price,
         targetPercentage: anyDrop ? 0.1 : discount,
         notifyOnDrop: emailNotify
       });
@@ -110,7 +112,6 @@ const AddProduct = () => {
         @keyframes spin { 100% { transform: rotate(360deg); } }
       `}
     </style>
-      {/* STEP 1: PASTE LINK */}
       {step === 1 && (
         <div style={styles.card}>
           <h1 style={{ textAlign: 'center' }}>Track a New Deal</h1>
