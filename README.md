@@ -1,4 +1,4 @@
-# [Deals-3-U: Automated Price Tracker (Try It Live!)](https://deals-3-u.onrender.com)
+# [Deals ❤️ U: Automated Price Tracker (Try It Live!)](https://deals-3-u.onrender.com)
 
 > **A full-stack distributed system that automates price tracking on Amazon, built to make smart shopping fun and effortless.**
 
