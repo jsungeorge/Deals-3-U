@@ -4,8 +4,8 @@ if (process.env.NODE_ENV !== 'production') {
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const axios = require('axios');
 const ScanLog = require('./models/ScanLog');
-const nodemailer = require('nodemailer');
 const User = require('./models/User');
 
 const authRoutes = require('./routes/auth');
@@ -40,24 +40,39 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendAlertEmail = async (userEmail, product) => {
-  const mailOptions = {
-    from: '"Deals ❤️ U" <dealsloveu@gmail.com>',
-    to: userEmail,
-    subject: `🎉 Price Drop Alert: ${product.title.substring(0, 20)}...`,
-    html: `
-      <h2>Good News!</h2>
-      <p>The price for <strong>${product.title}</strong> has dropped!</p>
-      <p><strong>New Price:</strong> $${product.currentPrice}</p>
-      <p><a href="${product.url}">Buy it now on Amazon</a></p>
-      <p> - Jiashu's Deal Tracker</p>
-    `
-  };
+  console.log(`Attempting to email ${userEmail}...`);
 
   try {
-    await transporter.sendMail(mailOptions);
-    console.log(`Email sent to ${userEmail}`);
+    const response = await axios.post(
+      'https://api.brevo.com/v3/smtp/email',
+      {
+        sender: { 
+          name: "Deals ❤️ U", 
+          email: "dealsloveu@gmail.com" 
+        },
+        to: [{ email: userEmail }],
+        subject: `🎉 Price Drop Alert: ${product.title.substring(0, 20)}...`,
+        htmlContent: `
+          <h2>Good News!</h2>
+          <p>The price for <strong>${product.title}</strong> has dropped!</p>
+          <p><strong>New Price:</strong> $${product.currentPrice}</p>
+          <p><a href="${product.url}">Buy it now on Amazon</a></p>
+          <br/>
+          <p> - Jiashu's Deal Tracker</p>
+        `
+      },
+      {
+        headers: {
+          'api-key': process.env.BREVO_API_KEY, // The key you added to .env
+          'content-type': 'application/json',
+          'accept': 'application/json'
+        }
+      }
+    );
+
+    console.log(`✅ Email sent successfully to ${userEmail}`);
   } catch (error) {
-    console.error("❌ Email failed:", error);
+    console.error("❌ Email failed:", error.response?.data || error.message);
   }
 };
 
