@@ -26,8 +26,7 @@ This project isn't just about saving money, it's about upgrading the purchasing 
 
 ## Tech Stack
 
-### **Core Language**
-* **JavaScript ES6+, HTML5, CSS3** 
+* **Core Language: JavaScript ES6+, HTML5, CSS3** 
 * **Frontend:** React, Tailwind CSS, Vite
 * **Backend:** Node.js, Express, Nodemailer
 * **Automation:** Puppeteer (Headless Chrome)
