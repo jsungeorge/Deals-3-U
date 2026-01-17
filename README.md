@@ -1,12 +1,10 @@
 # [Deals ❤️ U: Automated Price Tracker (Try It Live!)](https://deals-3-u.onrender.com)
 
+[![Demo Video](https://img.youtube.com/vi/YOUTUBE_VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=YOUTUBE_VIDEO_ID)
+
 > **A full-stack distributed system that automates price tracking on Amazon, built to make smart shopping fun and effortless.**
 
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES6%2B-yellow) ![MERN Stack](https://img.shields.io/badge/MERN-Full%20Stack-blue) ![Puppeteer](https://img.shields.io/badge/Puppeteer-Web%20Scraping-green) ![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-CI%2FCD-orange)
-
-[![Demo Video](https://img.youtube.com/vi/YOUTUBE_VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=Sxl14re7uOA)
-
-🎥 **Check out this quick Demo!!**
 
 ---
 
