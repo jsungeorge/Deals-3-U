@@ -10,9 +10,8 @@ const Home = () => {
   const [guestUrl, setGuestUrl] = useState('');
   const navigate = useNavigate();
 
-  // 1. POLL FOR UPDATES (Every 2 seconds)
+  // 1. POLL FOR UPDATES 
   useEffect(() => {
-    // Define fetch function inside to keep dependency array clean
     const fetchProducts = () => {
       if (user) {
         axios.get(`/api/products/user/${user.id}?t=${new Date().getTime()}`)
@@ -45,13 +44,12 @@ const Home = () => {
     if(!confirm("Are you sure you want to stop tracking this item?")) return;
     try {
       await axios.delete(`/api/products/${id}`);
-      // No manual fetch needed, the poller will catch it
     } catch (err) {
       alert("Error deleting item");
     }
   };
 
-  // --- FOOTER SIGNATURE COMPONENT ---
+  // FOOTER
   const Signature = () => (
     <div style={{ position: 'fixed', bottom: '20px', right: '20px', fontSize: '0.85rem', color: '#888', background: 'rgba(255,255,255,0.8)', padding: '5px 10px', borderRadius: '20px', backdropFilter: 'blur(5px)' }}>
       Built with ❤️ by <a href="https://www.linkedin.com/in/jiashusun/" target="_blank" rel="noopener noreferrer" style={{ color: '#db2777', textDecoration: 'none', fontWeight: 'bold' }}>Jiashu Sun</a>
