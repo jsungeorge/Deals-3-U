@@ -12,7 +12,6 @@ const Profile = () => {
     const fetchProducts = async () => {
       if (user && user.id) {
         try {
-          // 👇 CHANGED: Now fetches your Tracked Products
           const res = await axios.get(`/api/products/user/${user.id}`);
           setTrackedProducts(res.data);
         } catch (err) {
@@ -29,14 +28,12 @@ const Profile = () => {
 
   return (
     <div style={{ maxWidth: '800px', margin: '40px auto', padding: '0 20px' }}>
-      {/* Header Section */}
       <div style={{ marginBottom: '30px', borderBottom: '1px solid #eee', paddingBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h1 style={{ margin: 0 }}>My Dashboard</h1>
           <p style={{ color: 'var(--text-secondary)', marginTop: '5px' }}>Welcome back, {user.name}</p>
         </div>
         
-        {/* Quick button to add new items */}
         <Link to="/loans" className="btn btn-primary" style={{ textDecoration: 'none', fontSize: '0.9rem' }}>
           + Track New Item
         </Link>
@@ -106,7 +103,6 @@ const Profile = () => {
   );
 };
 
-// Updated Styles for "Price Cards"
 const styles = {
   grid: { display: 'flex', flexDirection: 'column', gap: '15px' },
   card: { 
