@@ -15,8 +15,7 @@ return (
     <div style={styles.content}>
       <h3 style={styles.title}>{asset.name}</h3>
       <p style={styles.meta}>{asset.category} • {asset.available} Available</p>
-      
-      {/* UPDATED BUTTON */}
+    
       <button 
         onClick={handleAdd} 
         disabled={isOutOfStock} // <--- Logic
