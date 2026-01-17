@@ -21,7 +21,7 @@ const Navbar = () => {
               </Link>
             </div>
           ) : (
-            // 👇 FIXED ALIGNMENT
+
             <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
               <Link to="/login" style={styles.link}>Login</Link>
               <Link to="/register" style={styles.btnAccent}>Sign Up</Link>
@@ -44,12 +44,12 @@ const styles = {
     textDecoration: 'none', 
     backgroundColor: '#db2777', 
     color: 'white', 
-    padding: '10px 24px', // Taller padding matches visual weight of text
+    padding: '10px 24px', 
     borderRadius: '30px', 
     fontWeight: 'bold', 
     fontSize: '0.95rem',
-    display: 'inline-block', // Ensures padding is respected
-    lineHeight: '1' // Prevents text from being pushed down
+    display: 'inline-block',
+    lineHeight: '1' 
   },
 };
 
