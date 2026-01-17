@@ -23,18 +23,16 @@ const Register = () => {
     }
 
     try {
-      // 2. Register API (Fix: Use formData values)
+      // 2. Register API 
       const res = await axios.post('/api/auth/register', { 
         name: formData.name, 
         email: formData.email, 
         password: formData.password 
       });
       
-      // Extract User & Token immediately
       const { user, token } = res.data;
 
-      // 3. ⚡️ AUTO-SAVE LOGIC (The "Kitchen Sink" Fix)
-      // Identical logic to Login.jsx ensures data passes validation
+      // 3. Autosave
       if (location.state?.productToSave) {
         try {
           const product = location.state.productToSave;
@@ -42,36 +40,28 @@ const Register = () => {
 
           await axios.post('/api/products/add', 
             {
-              // User ID (Safety Check)
               userId: user._id || user.id,
 
-              // Original Data
               ...product,
 
-              // ✅ FIELD MAPPING (Ensures DB validation passes)
               name: product.title, 
               title: product.title,
               image: product.image,
-              currentPrice: product.price, // DB might want currentPrice or price
+              currentPrice: product.price, 
               
-              // ✅ REQUIRED DEFAULTS
               category: "General", 
               available: true,
               targetPrice: calculatedTargetPrice
             },
             {
-              // ✅ CRITICAL: Pass the token we just got!
               headers: { 'Authorization': `Bearer ${token}` }
             }
           );
           console.log("✅ Item auto-saved for new user");
         } catch (saveErr) {
           console.error("❌ Auto-save failed:", saveErr);
-          // We intentionally continue logging them in even if save fails
         }
       }
-
-      // 4. Login Context & Redirect
       login(user, token);
       navigate('/');
 
