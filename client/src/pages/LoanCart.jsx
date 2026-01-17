@@ -71,7 +71,7 @@ const AddProduct = () => {
   };
 
 const handleSave = async () => {
-    // 1. IF USER IS GUEST (Sending data to Login)
+    // 1. IF USER IS GUEST 
     if (!user) {
       const productToSave = {
         url: url,
@@ -85,7 +85,7 @@ const handleSave = async () => {
       return;
     }
 
-    // 2. IF USER IS LOGGED IN (Direct Save)
+    // 2. IF USER IS LOGGED IN
     setLoading(true);
     try {
       await axios.post('/api/products/add', {
@@ -157,7 +157,6 @@ const handleSave = async () => {
         </div>
       )}
 
-      {/* STEP 2: CONFIGURE */}
       {step === 2 && previewData && (
         <div style={styles.card}>
           <div style={{ display: 'flex', gap: '20px', marginBottom: '30px' }}>
@@ -165,7 +164,6 @@ const handleSave = async () => {
             <div>
               <h3 style={{ margin: '0 0 10px 0' }}>{previewData.title.substring(0, 60)}...</h3>
               <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#059669' }}>
-                {/* ⬇️ THIS WAS THE BUG. CHANGED FROM formattedPrice TO price */}
                 ${previewData.price} 
               </div>
             </div>
@@ -204,13 +202,13 @@ const handleSave = async () => {
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
        <input 
         type="checkbox" 
-        id="emailNotify" // 1. Added ID
+        id="emailNotify"
         checked={emailNotify} 
         onChange={(e) => setEmailNotify(e.target.checked)}
         style={{ 
       width: '18px', 
       height: '18px', 
-      accentColor: '#db2777', // 2. Matches your Pink Theme
+      accentColor: '#db2777', 
       cursor: 'pointer' 
     }}
   />
