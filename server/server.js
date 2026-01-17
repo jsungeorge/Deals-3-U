@@ -98,7 +98,7 @@ const runBatchScan = async (source = "Automated") => {
       }
     };
 
-    // 🔄 THE BATCH LOOP
+    // THE BATCH LOOP
     for (let i = 0; i < products.length; i += BATCH_SIZE) {
       const batch = products.slice(i, i + BATCH_SIZE);
       console.log(`...Processing items ${i + 1} to ${i + batch.length}...`);
