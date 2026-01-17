@@ -10,11 +10,11 @@ const ProductSchema = new mongoose.Schema({
   
   // Tracking Details
   url: { type: String, required: true },
-  initialPrice: { type: Number, required: true }, // Price when they first added it
-  targetPrice: { type: Number }, // Optional: "Alert me when it hits $150"
+  initialPrice: { type: Number, required: true }, 
+  targetPrice: { type: Number }, 
   
-  targetPercentage: { type: Number, default: 5 }, // e.g. 5% off
-  notifyOnDrop: { type: Boolean, default: false }, // "Send me email"
+  targetPercentage: { type: Number, default: 5 },
+  notifyOnDrop: { type: Boolean, default: false }, 
   
   dateAdded: { type: Date, default: Date.now }
 });
