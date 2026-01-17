@@ -27,7 +27,7 @@ router.post('/register', async (req, res) => {
     // 4. Create Token
     const token = jwt.sign({ id: savedUser._id }, process.env.JWT_SECRET);
 
-    // 5. Respond with Token + User Info (including dateJoined)
+    // 5. Respond with Token + User Info
     res.json({
       token,
       user: {
@@ -65,7 +65,7 @@ router.post('/login', async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        dateJoined: user.dateJoined // <--- Send this!
+        dateJoined: user.dateJoined 
       }
     });
 
