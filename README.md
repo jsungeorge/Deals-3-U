@@ -9,7 +9,7 @@
 ## The Story
 Let's be real: we all love the thrill of finding a great deal. There is nothing quite like the satisfaction of snagging that tech gadget or everyday essential right when the price dips. But constantly refreshing tabs to check for discounts? That takes all the fun out of it.
 
-I built this project because I wanted to automate the "hunt" for that sweet deal. I wanted a tool that does the heavy lifting in the background, giving me a "set-and-forget" experience.
+I built this project because I wanted to automate the hunt for that sweet deal. I wanted a tool that does the heavy lifting in the background, giving me a "set-and-forget" experience.
 
 This project isn't just about saving money, it's about upgrading the purchasing experience. It's a fun, hassle-free way for me (and any other user) to track the items we want and get the best price without the hustle.
 
@@ -36,7 +36,7 @@ This project isn't just about saving money, it's about upgrading the purchasing 
 ---
 
 ## Technical Challenges & Solutions
-Building a scraper is easy. Building a *reliable* scraper on a **Free Tier Cloud Server** with 512MB RAM is a war. Here are the biggest hurdles I overcame:
+Building a scraper is easy. Building a reliable scraper on a with 512MB RAM is a quite a different story. Here are the biggest hurdles I overcame:
 
 ### 1. The "Memory Crisis" (OOM Crashes)
 **The Problem:** Running Headless Chrome consumes ~400MB+ RAM. Render's free tier limit is 512MB. Opening just two tabs in parallel caused the server to crash immediately with `Error: Instance failed: Ran out of memory`.
@@ -59,3 +59,4 @@ Building a scraper is easy. Building a *reliable* scraper on a **Free Tier Cloud
 
 ### 4. The "Sleepy Server" (Cold Starts)
 **The Problem:** Free tier servers "spin down" after inactivity.
+**The Outcome:** Implemented a scheduler using GitHub Action
