@@ -19,7 +19,7 @@ const Login = () => {
       const res = await axios.post('/api/auth/login', { email, password });
       const { user, token } = res.data;
 
-      // 2. Auto-Save Product (Silent & Fast)
+      // 2. Auto-Save Product 
       if (location.state?.productToSave) {
         try {
           const product = location.state.productToSave;
@@ -27,17 +27,15 @@ const Login = () => {
 
           await axios.post('/api/products/add', 
             {
-              // User ID (Safety Check)
+
               userId: user._id || user.id,
 
-              // Product Data
               ...product,
               
-              // Field Name Safety Nets (Ensures DB accepts it)
               name: product.title, 
               image: product.image,
               currentPrice: product.price,
-              category: "General", // Default category to prevent crashes
+              category: "General",
               available: true,
               targetPrice: calculatedTargetPrice
             },
@@ -47,12 +45,10 @@ const Login = () => {
           );
           console.log("Item auto-saved successfully");
         } catch (saveErr) {
-          // If it fails, we log it but don't stop the user from logging in
           console.error("Auto-save failed:", saveErr);
         }
       }
 
-      // 3. Update Global State & Redirect
       login(user, token);
       navigate('/');
 
