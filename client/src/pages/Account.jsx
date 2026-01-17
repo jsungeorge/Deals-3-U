@@ -8,7 +8,7 @@ const Account = () => {
 
   if (!user) return <div style={{ padding: '40px' }}>Please log in.</div>;
 
-  // Format the date (e.g., "January 7, 2026")
+  // Format the date 
   const joinDate = user.dateJoined 
     ? new Date(user.dateJoined).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
     : 'Unknown';
