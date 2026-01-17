@@ -4,7 +4,7 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // Helps prevent "flicker" on refresh
+  const [loading, setLoading] = useState(true); 
 
   useEffect(() => {
     // Check for saved token on startup
