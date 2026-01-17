@@ -1,18 +1,15 @@
 :root {
-  /* The "Tech" Palette */
-  --bg-main: #f6f9fc;      /* Very light blue-grey (Stripe style) */
-  --bg-surface: #ffffff;   /* Pure white for cards */
-  --primary: #6366f1;      /* Indigo (Professional, not playful) */
-  --text-main: #1f2937;    /* Almost black (softer on eyes) */
-  --text-secondary: #6b7280; /* Grey text for details */
-  --border: #e5e7eb;       /* Subtle borders */
+  --bg-main: #f6f9fc;      
+  --bg-surface: #ffffff;   
+  --primary: #6366f1;      
+  --text-main: #1f2937;  
+  --text-secondary: #6b7280; 
+  --border: #e5e7eb;      
   
-  /* Status Colors */
-  --success: #10b981;      /* Emerald Green */
-  --warning: #f59e0b;      /* Amber */
-  --danger: #ef4444;       /* Red */
+  --success: #10b981;    
+  --warning: #f59e0b;   
+  --danger: #ef4444;     
 
-  /* Spacing & Shadows */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
   --radius: 8px;
@@ -26,7 +23,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Global Utilities */
 .btn {
   padding: 10px 16px;
   border-radius: var(--radius);
