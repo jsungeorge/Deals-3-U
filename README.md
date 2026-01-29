@@ -45,7 +45,7 @@ Building a scraper is easy. Building a reliable scraper on a with 512MB RAM is a
 **The Solution:**
 * **Strict Serial Processing:** Abandoned parallel `Promise.all` batching in favor of a stable, sequential loop.
 * **Resource Blocking:** Implemented Request Interception to block images, fonts, and stylesheets, reducing scraping memory footprint by ~50%.
-* **Container Optimization:** Tuned Puppeteer launch arguments to function reliably within the Docker runtime.
+* **Container Optimization:** Puppeteer -> Cheerio, tuning launch arguments to function reliably within the Docker runtime.
 
 ### 2. The "30-Second Death" (Timeouts)
 **The Problem:** Cloud servers can be slow. A standard 30-second timeout often failed when Amazon's pages were heavy, causing the scan to abort mid-process.
